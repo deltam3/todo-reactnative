@@ -5,9 +5,10 @@ import {
   Dimensions,
   Animated,
   Easing,
+  Pressable,
 } from "react-native";
 import React from "react";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link } from "expo-router";
 
 const { width, height } = Dimensions.get("screen");
@@ -33,6 +34,14 @@ const SlideItem = ({ item, isLastItem }: SlideItemProps) => {
     easing: Easing.inOut(Easing.ease),
   }).start();
 
+  const onFinishOnboarding = async () => {
+    try {
+      await AsyncStorage.setItem("isOnboarded", "true");
+    } catch (e) {
+      // saving error
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Animated.Image
@@ -52,9 +61,11 @@ const SlideItem = ({ item, isLastItem }: SlideItemProps) => {
 
       <View style={styles.content}>
         {isLastItem && (
-          <View>
-            <Link href="/(auth)/loginScreen">로그인하기</Link>
-          </View>
+          <Pressable onPress={() => onFinishOnboarding()}>
+            <View>
+              <Link href="/(auth)/loginScreen">로그인하기</Link>
+            </View>
+          </Pressable>
         )}
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.description}>{item.description}</Text>
