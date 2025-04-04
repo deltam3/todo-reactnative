@@ -37,9 +37,7 @@ const SlideItem = ({ item, isLastItem }: SlideItemProps) => {
   const onFinishOnboarding = async () => {
     try {
       await AsyncStorage.setItem("isOnboarded", "true");
-    } catch (e) {
-      // saving error
-    }
+    } catch (e) {}
   };
 
   return (

@@ -32,7 +32,8 @@ SplashScreen.preventAutoHideAsync();
 // }
 
 import { Stack } from "expo-router";
-import { SafeAreaView, View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -58,6 +59,7 @@ export default function RootLayout() {
         />
         <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+
         <Stack.Screen name="(app)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>

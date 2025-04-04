@@ -8,40 +8,14 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Link } from "expo-router";
-import * as SecureStore from "expo-secure-store";
-
-import { useRouter } from "expo-router";
-
-async function save(key: string, value: string) {
-  await SecureStore.setItemAsync(key, value);
-}
-
-async function getValueFor(key: string) {
-  let result = await SecureStore.getItemAsync(key);
-  if (result) {
-    console.log(result);
-  } else {
-    console.log(result);
-  }
-}
 
 export default function Index() {
-  const router = useRouter();
-
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
 
-  const handleUsernameChange = (inputText: string) => {
-    setUsername(inputText);
-  };
-
-  const handlePasswordChange = (inputText: string) => {
-    setPassword(inputText);
-  };
-
   const postData = async () => {
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
+      const response = await fetch("http://localhost:3000/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -53,24 +27,24 @@ export default function Index() {
       });
 
       const data = await response.json();
-      console.log("Response data:", data);
-      console.log(`${username} ${password}`);
-
-      if (data.access_token) {
-        const token = data.access_token;
-        save("access_token", token);
-        router.navigate("/(app)/mainapp");
-      } else {
-        alert("BREAK");
-      }
     } catch (error) {
       console.error("Error making POST request:", error);
     }
+    console.log("POST DATA");
+  };
+
+  const handleUsernameChange = (inputText: string) => {
+    setUsername(inputText);
+  };
+
+  const handlePasswordChange = (inputText: string) => {
+    setPassword(inputText);
   };
 
   return (
     <View style={styles.container}>
       <Text>아이디</Text>
+
       <TextInput
         style={styles.input}
         autoCapitalize="none"
@@ -86,19 +60,9 @@ export default function Index() {
         onChangeText={handlePasswordChange}
       />
 
-      <View>
+      <View style={styles.center}>
         <Pressable onPress={() => postData()}>
-          <Text>로그인</Text>
-        </Pressable>
-      </View>
-
-      <View>
-        <Link href="/(auth)/signupScreen">회원가입</Link>
-      </View>
-
-      <View>
-        <Pressable onPress={() => getValueFor("access_token")}>
-          <Text>결과</Text>
+          <Text>회원가입</Text>
         </Pressable>
       </View>
     </View>
@@ -114,5 +78,9 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
+  },
+  center: {
+    flex: 1,
+    alignItems: "center",
   },
 });
