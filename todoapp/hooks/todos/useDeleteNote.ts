@@ -7,30 +7,29 @@ async function getToken() {
   return await SecureStore.getItemAsync("access_token");
 }
 
-const addTodoItem = async (todoItem: TodoItemType) => {
+const deleteNoteItem = async (noteItemId: number) => {
   const token = await getToken();
-  const response = await fetch(API_URL, {
-    method: "POST",
+  const tester = `${API_URL}/${noteItemId}`;
+  console.log(`tester: ${tester}`);
+
+  const response = await fetch(`${API_URL}/${noteItemId}`, {
+    method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(todoItem),
+    // body: JSON.stringify(noteItemId),
   });
+
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
+
   const result = await response.json();
   return result;
 };
 
-
-export const useAddTodo = async (todoItem: TodoItemType) => {
-  try {
-    const result = await addTodoItem(todoItem);
-    return result;
-  } catch (error) {
-    console.error("Error adding todo:", error);
-    throw error; 
-  }
+export const useDeleteNoteItem = (noteItemId: number) => {
+  const result = deleteNoteItem(noteItemId);
+  return result;
 };

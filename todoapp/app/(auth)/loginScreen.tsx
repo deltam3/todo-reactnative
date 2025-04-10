@@ -10,7 +10,8 @@ import React, { useEffect, useState } from "react";
 import { Link } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 
-import { useRouter } from "expo-router";
+
+import { useRouter, Redirect } from "expo-router";
 
 async function save(key: string, value: string) {
   await SecureStore.setItemAsync(key, value);
@@ -24,12 +25,16 @@ async function getValueFor(key: string) {
     console.log(result);
   }
 }
+import { useNavigation } from '@react-navigation/native';
 
 export default function Index() {
+  const navigation = useNavigation();
+
+
   const router = useRouter();
 
-  const [username, setUsername] = useState<string>();
-  const [password, setPassword] = useState<string>();
+  const [username, setUsername] = useState<string>("temp1");
+  const [password, setPassword] = useState<string>("pass");
 
   const handleUsernameChange = (inputText: string) => {
     setUsername(inputText);
@@ -53,13 +58,12 @@ export default function Index() {
       });
 
       const data = await response.json();
-      console.log("Response data:", data);
-      console.log(`${username} ${password}`);
 
       if (data.access_token) {
         const token = data.access_token;
         save("access_token", token);
-        router.navigate("/(app)/mainapp");
+        router.navigate("/(app)/(tabs)/mainapp");
+
       } else {
         alert("BREAK");
       }

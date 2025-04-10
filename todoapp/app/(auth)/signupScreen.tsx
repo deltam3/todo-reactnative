@@ -8,8 +8,15 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Link } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 
+async function save(key: string, value: string) {
+  await SecureStore.setItemAsync(key, value);
+}
+
+import { useRouter } from "expo-router";
 export default function Index() {
+  const router = useRouter();
   const [username, setUsername] = useState<string>();
   const [password, setPassword] = useState<string>();
 
@@ -27,6 +34,14 @@ export default function Index() {
       });
 
       const data = await response.json();
+      console.log(data.access_token);
+      if (data.access_token) {
+        const token = data.access_token;
+        save("access_token", token);
+        router.navigate("/(app)/mainapp");
+      } else {
+        // alert("BREAK");
+      }
     } catch (error) {
       console.error("Error making POST request:", error);
     }

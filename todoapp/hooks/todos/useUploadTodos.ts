@@ -1,4 +1,4 @@
-import { TodoItemType } from "@/app/(app)/mainapp";
+import { TodoItemType } from "@/app/(app)/(tabs)/mainapp";
 
 const API_URL = "http://localhost:3000/todos/sync";
 
