@@ -4,37 +4,49 @@
     "slug": "todoapp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/noteapplogo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/noteapplogo.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#DFC8B4"
+    },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.expoisgood.todoapp"
+      "bundleIdentifier": "com.expoisgood.todoapp",
+      "splash": {
+        "image": "./assets/images/noteapplogo.png",
+        "resizeMode": "cover",
+        "backgroundColor": "#DFC8B4",
+        "dark": {
+          "image": "./assets/images/noteapplogo.png",
+          "resizeMode": "cover",
+          "backgroundColor": "#DFC8B4"
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.expoisgood.todoapp"
+      "package": "com.expoisgood.todoapp",
+      "splash": {
+        "image": "./assets/images/noteapplogo.png",
+        "resizeMode": "cover",
+        "backgroundColor": "#DFC8B4"
+      }
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/noteapplogo.png"
     },
     "plugins": [
       "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ],
+      ["expo-splash-screen", {}],
       "expo-secure-store",
       "expo-sqlite"
     ],

@@ -2,16 +2,27 @@ import {
   Text,
   View,
   ActivityIndicator,
-  FlatList,
   TextInput,
   StyleSheet,
   Pressable,
+  FlatList,
 } from "react-native";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import * as SQLite from "expo-sqlite";
-import TodoItem from "@/components/todo/TodoItem";
-import { useUploadTodos } from "@/hooks/todos/useUploadTodos";
+
+import * as SecureStore from "expo-secure-store";
+import { Redirect } from "expo-router";
+import useCheckLoginStatus from "@/hooks/useCheckLoginStatus";
+
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTodos } from "@/hooks/todos/useGetTodo";
+
+const AddTodoSchema = z.object({
+  title: z.string().min(1, "최소 1글자 이상 입력"),
+  description: z.string().min(1, "최소 1글자 이상 입력"),
+});
+
+type TodoFormData = z.infer<typeof AddTodoSchema>;
 
 export interface TodoItemType {
   cloudId?: number;
@@ -22,35 +33,34 @@ export interface TodoItemType {
   lastModified?: Date;
 }
 
-import { useAddTodo } from "@/hooks/todos/useAddTodo";
-import useCheckLoginStatus from "@/hooks/useCheckLoginStatus";
-import { useQueryClient } from "@tanstack/react-query";
-import { Redirect } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import TodoItem from "@/components/todo/TodoItem";
 
-export default function Index() {
+import * as SQLite from "expo-sqlite";
+import { useAddTodo } from "@/hooks/todos/useAddTodo";
+
+export default function MainApp() {
   const isAuthenticated = useCheckLoginStatus();
 
   if (!isAuthenticated) {
     return <Redirect href="/(auth)/loginScreen" />;
   }
-  const [title, setTitle] = useState<string>();
-  const [description, setDescription] = useState<string>();
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<TodoFormData>({
+    resolver: zodResolver(AddTodoSchema),
+  });
   const [todos, setTodos] = useState<TodoItemType[]>();
-  const { data, isPending } = useTodos();
+  const { fetchedTodos, isPending } = useTodos();
 
   const db = SQLite.useSQLiteContext();
 
-  const handleTitleChange = (inputText: string) => {
-    setTitle(inputText);
-  };
-
-  const handleDescriptionChange = (inputText: string) => {
-    setDescription(inputText);
-  };
-
-  // 초기화 작업
   React.useEffect(() => {
-    if (!data) return; 
+    if (!fetchedTodos) return;
     const syncData = async () => {
       try {
         // sqlite 초기화
@@ -62,15 +72,13 @@ export default function Index() {
           description TEXT NOT NULL,
           completed BOOLEAN NOT NULL DEFAULT 0
         );`);
-
       } catch (dbError) {
         console.error("Error initializing SQLite:", dbError);
       }
 
       try {
         // Construct the INSERT statements
-
-        const insertQueries = data
+        const insertQueries = fetchedTodos
           .map(
             (todo: TodoItemType) => `
           INSERT INTO Todo (localId, title, description, completed)
@@ -78,74 +86,49 @@ export default function Index() {
         `
           )
           .join(" ");
-        
+
         // Execute the bulk insert
         await db.execAsync(`
           ${insertQueries}
         `);
-        // console.log(data)
+
         await getLocalNotes();
-      } catch (error) {
-       
-      }
+      } catch (error) {}
     };
-    
+
     syncData();
-  }, [data] );
+  }, [fetchedTodos]);
 
   async function getLocalNotes() {
     try {
-
       const result = (await db.getAllAsync(
         `SELECT * FROM Todo`
       )) as TodoItemType[];
-      console.log("LOCAL SAVED DB: " + result);
       setTodos(result);
     } catch (error) {
       console.error("getLocalNotes error:", error);
     }
   }
 
-  // async function createLocalNote(note: any) {
-  //   try {
-  //     const outerResult = await db.withTransactionAsync(async () => {
-  //       const result = await db.runAsync(
-  //         `INSERT INTO Todo (title, description) VALUES (?, ?,)`,
-  //         [note.title, note.description]
-  //       );
-
-  //       await getLocalNotes();
-  //       return result.lastInsertRowId;
-  //     });
-
-  //     const finalResult = await outerResult;
-  //     await getLocalNotes();
-  //     return finalResult;
-  //   } catch (error) {
-  //     console.error("Error creating local note:", error);
-  //   }
-  // }
   async function createLocalNote(note: any): Promise<number | undefined> {
-    let lastInsertedId: number | undefined; 
+    let lastInsertedId: number | undefined;
 
     try {
       await db.withTransactionAsync(async () => {
         const result = await db.runAsync(
-          `INSERT INTO Todo (title, description) VALUES (?, ?)`, 
+          `INSERT INTO Todo (title, description) VALUES (?, ?)`,
           [note.title, note.description]
         );
 
-        lastInsertedId = result.lastInsertRowId; 
-        
+        lastInsertedId = result.lastInsertRowId;
       });
 
-      
       await getLocalNotes();
 
-      return lastInsertedId; // Return the last inserted ID
+      return lastInsertedId;
     } catch (error) {
       console.error("Error creating local note:", error);
-      return undefined; 
+      return undefined;
     }
   }
 
@@ -156,49 +139,77 @@ export default function Index() {
     });
   }
 
-  const onPressSubmit = async () => {
-    const firstTemp = { title, description };
+  const onPressSubmit = async (data: TodoFormData) => {
+    console.log(data);
+    const firstTemp = { title: data.title, description: data.description };
     const insertedId = await createLocalNote(firstTemp);
-    
+
     const temp = {
-      title: title,
-      description: description,
+      title: data.title,
+      description: data.description,
       localId: insertedId,
     } as TodoItemType;
-      useAddTodo(temp);
+    useAddTodo(temp);
 
-    setTitle("");
-    setDescription("");
+    reset();
   };
 
   return (
     <View>
       <Text style={{ textAlign: "center" }}>노트 어플</Text>
+
       <View>
         <Text>제목</Text>
-        <TextInput
-          style={styles.input}
-          autoCapitalize="none"
-          value={title}
-          onChangeText={handleTitleChange}
+        <Controller
+          control={control}
+          name="title"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="제목"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              autoCapitalize="none"
+              value={value}
+            />
+          )}
         />
-        <Text>설명</Text>
-        <TextInput
-          style={styles.input}
-          autoCapitalize="none"
-          value={description}
-          onChangeText={handleDescriptionChange}
+        {errors.title && (
+          <Text style={styles.error}>{errors.title.message}</Text>
+        )}
+
+        <Text>내용</Text>
+        <Controller
+          control={control}
+          name="description"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="설명"
+              autoCapitalize="none"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+          )}
         />
-        <Pressable onPress={onPressSubmit}>
+        {errors.description && (
+          <Text style={styles.error}>{errors.description.message}</Text>
+        )}
+        <Pressable onPress={handleSubmit(onPressSubmit)}>
           <Text style={{ textAlign: "center" }}>추가</Text>
         </Pressable>
       </View>
 
       <FlatList
         data={todos}
-        keyExtractor={(item) => item.localId.toString() || Math.random()}
+        keyExtractor={(item) => item.localId.toString()}
         renderItem={({ item }: any) => (
-          <TodoItem item={item} deleteItem={deleteLocalNote} />
+          <TodoItem
+            item={item}
+            deleteItem={deleteLocalNote}
+            getLocalNotes={getLocalNotes}
+          />
         )}
       />
     </View>
@@ -207,29 +218,39 @@ export default function Index() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 200,
+    padding: 20,
+    justifyContent: "center",
+    flex: 1,
+  },
+  label: {
+    marginBottom: 4,
+    fontWeight: "bold",
   },
   input: {
-    height: 40,
-    margin: 12,
+    height: 48,
     borderWidth: 1,
-    padding: 10,
+    borderColor: "#ccc",
+    marginBottom: 12,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+  },
+  error: {
+    color: "red",
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: "#3478f6",
+    paddingVertical: 12,
+    borderRadius: 6,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  signupContainer: {
+    marginTop: 20,
+    alignItems: "center",
   },
 });
-
-// async function deleteAllLocalNotes() {
-//   db.withTransactionAsync(async () => {
-//     await db.runAsync(`DELETE FROM Todo`);
-//     await getLocalNotes();
-//   });
-// }
-
-// PRAGMA journal_mode = WAL;user
-
-// React.useEffect(() => {
-//   if (todos === undefined) {
-//     return;
-//   }
-//   const data = todos as TodoItemType[];
-//   useUploadTodos(data);
-// }, [todos]);

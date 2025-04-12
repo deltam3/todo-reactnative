@@ -13,7 +13,7 @@ const getTodos = async () => {
   const response = await fetch(API_URL, {
     method: "GET",
     headers: {
-      "Authorization": `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
   });
@@ -25,6 +25,9 @@ const getTodos = async () => {
 };
 
 export const useTodos = () => {
-  const result = useQuery({ queryKey: ["todos"], queryFn: getTodos });
-  return result;
+  const { data: fetchedTodos, isPending } = useQuery({
+    queryKey: ["todos"],
+    queryFn: getTodos,
+  });
+  return { fetchedTodos, isPending };
 };
