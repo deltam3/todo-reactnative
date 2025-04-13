@@ -33,6 +33,8 @@ type EditTodoFormData = z.infer<typeof EditTodoSchema>;
 import * as SQLite from "expo-sqlite";
 import { useEditTodo } from "@/hooks/todos/useEditTodo";
 
+import Card from "../ui/Card";
+
 export default function TodoItem({
   item,
   deleteItem,
@@ -100,126 +102,139 @@ export default function TodoItem({
   };
 
   const cancelEditHandler = () => {
-    console.log("Cancel");
     reset();
     setIsEditMode(false);
   };
 
   if (isEditMode === false) {
     return (
-      <View style={{ marginVertical: 4 }}>
-        <Text>완료여부: {item.completed ? "✅" : "❌"}</Text>
-        <Text style={styles.text}>제목: {item.title}</Text>
-        <Text>설명: {item.description}</Text>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingHorizontal: 30,
-          }}
-        >
-          <Pressable onPress={() => onDeleteHandler()}>
-            {/* <Button onPress={() => onDeleteHandler()}> */}
-            <Text>삭제</Text>
-            {/* </Button> */}
-          </Pressable>
-          <Pressable onPress={() => onEditHandler()}>
-            <Text>수정하기</Text>
-          </Pressable>
+      <Card style={{ backgroundColor: "gray", marginBottom: 10 }}>
+        <View>
+          <View style={{ marginBottom: 10 }}>
+            <Text>완료여부: {item.completed ? "✅" : "❌"}</Text>
+            <Text style={styles.text}>제목: {item.title}</Text>
+            <Text>설명: {item.description}</Text>
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingHorizontal: 30,
+            }}
+          >
+            <Button>
+              <Pressable onPress={() => onDeleteHandler()}>
+                <Text>삭제</Text>
+              </Pressable>
+            </Button>
+            <Button>
+              <Pressable onPress={() => onEditHandler()}>
+                <Text>수정하기</Text>
+              </Pressable>
+            </Button>
+          </View>
         </View>
-      </View>
+      </Card>
     );
   }
 
   if (isEditMode === true) {
     return (
-      <View>
-        <View
-          style={{
-            margin: 2,
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <Text style={styles.text}>완료여부: </Text>
-          <Controller
-            control={control}
-            name="completed"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text style={{ marginRight: 10 }}>{value ? "✅" : "❌"}</Text>
-                <Switch
-                  trackColor={{ false: "#767577", true: "#81b0ff" }}
-                  thumbColor={value ? "#f54b8c" : "#f4f3f4"}
-                  ios_backgroundColor="#3e3e3e"
-                  onValueChange={onChange}
+      <Card style={{ backgroundColor: "gray", marginBottom: 10 }}>
+        <View>
+          <View
+            style={{
+              margin: 2,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Text style={styles.text}>완료여부: </Text>
+            <Controller
+              control={control}
+              name="completed"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Text style={{ marginRight: 10 }}>{value ? "✅" : "❌"}</Text>
+                  <Switch
+                    trackColor={{ false: "#767577", true: "#81b0ff" }}
+                    thumbColor={value ? "#f54b8c" : "#f4f3f4"}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={onChange}
+                    value={value}
+                  />
+                </View>
+              )}
+            />
+          </View>
+          <View
+            style={{
+              margin: 2,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Text style={styles.text}>제목: </Text>
+            <Controller
+              control={control}
+              name="title"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder="제목"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  autoCapitalize="none"
                   value={value}
                 />
-              </View>
-            )}
-          />
+              )}
+            />
+          </View>
+          <View
+            style={{
+              margin: 2,
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 16,
+            }}
+          >
+            <Text style={styles.text}>설명: </Text>
+            <Controller
+              control={control}
+              name="description"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder="설명"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  autoCapitalize="none"
+                  value={value}
+                />
+              )}
+            />
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingHorizontal: 20,
+            }}
+          >
+            <Button>
+              <Pressable onPress={handleSubmit(onSubmitEdit)}>
+                <Text>수정 완성하기</Text>
+              </Pressable>
+            </Button>
+            <Button>
+              <Pressable onPress={() => cancelEditHandler()}>
+                <Text>취소하기</Text>
+              </Pressable>
+            </Button>
+          </View>
         </View>
-        <View
-          style={{
-            margin: 2,
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <Text style={styles.text}>제목: </Text>
-          <Controller
-            control={control}
-            name="title"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                style={styles.input}
-                placeholder="제목"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                autoCapitalize="none"
-                value={value}
-              />
-            )}
-          />
-        </View>
-        <View
-          style={{
-            margin: 2,
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <Text style={styles.text}>설명: </Text>
-          <Controller
-            control={control}
-            name="description"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                style={styles.input}
-                placeholder="설명"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                autoCapitalize="none"
-                value={value}
-              />
-            )}
-          />
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingHorizontal: 20,
-          }}
-        >
-          <Pressable onPress={handleSubmit(onSubmitEdit)}>
-            <Text>수정 완성하기</Text>
-          </Pressable>
-          <Pressable onPress={() => cancelEditHandler()}>
-            <Text>취소하기</Text>
-          </Pressable>
-        </View>
-      </View>
+      </Card>
     );
   }
 }
@@ -231,15 +246,10 @@ const styles = StyleSheet.create({
   text: {
     color: "black",
   },
-  // input: {
-  //   height: 40,
-  //   margin: 12,
-  //   borderWidth: 1,
-  //   padding: 10,
-  // },
+
   input: {
-    width: 500,
-    // height: 48,
+    width: 300,
+    height: 32,
     borderWidth: 2,
     borderColor: "#ccc",
     paddingHorizontal: 5,

@@ -18,8 +18,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTodos } from "@/hooks/todos/useGetTodo";
 
 const AddTodoSchema = z.object({
-  title: z.string().min(1, "최소 1글자 이상 입력"),
-  description: z.string().min(1, "최소 1글자 이상 입력"),
+  // title: z.string().min(1, "최소 1글자 이상 입력"),
+  title: z
+    .string({ required_error: "최소 1글자 이상 입력" })
+    .min(1, "최소 1글자 이상 입력"),
+  // description: z.string().min(1, "최소 1글자 이상 입력"),
+  description: z
+    .string({ required_error: "최소 1글자 이상 입력" })
+    .min(1, "최소 1글자 이상 입력"),
 });
 
 type TodoFormData = z.infer<typeof AddTodoSchema>;
@@ -38,6 +44,7 @@ import TodoItem from "@/components/todo/TodoItem";
 
 import * as SQLite from "expo-sqlite";
 import { useAddTodo } from "@/hooks/todos/useAddTodo";
+import Button from "@/components/ui/Button";
 
 export default function MainApp() {
   const isAuthenticated = useCheckLoginStatus();
@@ -155,10 +162,10 @@ export default function MainApp() {
   };
 
   return (
-    <View>
+    <View style={{ paddingHorizontal: 8 }}>
       <Text style={{ textAlign: "center" }}>노트 어플</Text>
 
-      <View>
+      <View style={{ marginBottom: 16 }}>
         <Text>제목</Text>
         <Controller
           control={control}
@@ -196,9 +203,12 @@ export default function MainApp() {
         {errors.description && (
           <Text style={styles.error}>{errors.description.message}</Text>
         )}
-        <Pressable onPress={handleSubmit(onPressSubmit)}>
-          <Text style={{ textAlign: "center" }}>추가</Text>
-        </Pressable>
+        <Button style={{ backgroundColor: "blue" }}>
+          <Pressable onPress={handleSubmit(onPressSubmit)}>
+            <Text style={{ color: "white", fontWeight: "bold" }}>추가</Text>
+            {/* <Text style={{ textAlign: "center" }}>추가</Text> */}
+          </Pressable>
+        </Button>
       </View>
 
       <FlatList
