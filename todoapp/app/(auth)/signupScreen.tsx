@@ -38,6 +38,10 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 import { useRouter } from "expo-router";
+
+import Constants from "expo-constants";
+const { API_URL } = Constants.expoConfig.extra;
+
 export default function SignupScreen() {
   const router = useRouter();
   const {
@@ -50,7 +54,7 @@ export default function SignupScreen() {
 
   const postData = async (data: LoginFormData) => {
     try {
-      const response = await fetch("http://localhost:3000/auth/signup", {
+      const response = await fetch(`${API_URL}/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

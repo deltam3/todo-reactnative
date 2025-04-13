@@ -50,6 +50,9 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { act } from "@testing-library/react-native";
 
+import Constants from "expo-constants";
+const { API_URL } = Constants.expoConfig.extra;
+
 export default function MainApp() {
   const isAuthenticated = useCheckLoginStatus();
 
@@ -169,7 +172,7 @@ export default function MainApp() {
     <ThemedView style={{ paddingHorizontal: 8, flex: 1 }}>
       <SafeAreaView>
         <Text style={{ textAlign: "center" }}>노트 어플</Text>
-
+        <Text>{`${API_URL}` + `/todos`}</Text>
         <View style={{ marginBottom: 16 }}>
           <ThemedText>제목</ThemedText>
           <Controller

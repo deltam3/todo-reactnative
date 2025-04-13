@@ -86,9 +86,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.expoisgood.todoapp'
+    namespace 'com.expoisgood.myapp'
     defaultConfig {
-        applicationId 'com.expoisgood.todoapp'
+        applicationId 'com.expoisgood.myapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

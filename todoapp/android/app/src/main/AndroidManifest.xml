@@ -27,6 +27,8 @@
         <data android:scheme="myapp"/>
         <data android:scheme="com.expoisgood.todoapp"/>
         <data android:scheme="exp+todoapp"/>
+        <data android:scheme="com.expoisgood.myapp"/>
+        <data android:scheme="exp+myapp"/>
       </intent-filter>
     </activity>
   </application>

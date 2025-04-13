@@ -1,6 +1,8 @@
 import { TodoItemType } from "@/app/(app)/(tabs)/mainapp";
 
-const API_URL = "http://localhost:3000/todos/sync";
+import Constants from "expo-constants";
+const { API_URL } = Constants.expoConfig.extra;
+const FINAL_API_URL = `${API_URL}` + `/todos/sync`;
 
 export const useUploadTodos = (todos: TodoItemType[]) => {
   const uploadTodos = async () => {

@@ -5,7 +5,9 @@ async function getToken() {
   return await SecureStore.getItemAsync("access_token");
 }
 
-const API_URL = "http://localhost:3000/todos/";
+import Constants from "expo-constants";
+const { PREAPI_URL } = Constants.expoConfig.extra;
+const API_URL = `${PREAPI_URL}` + `/todos`;
 
 const getTodos = async () => {
   const token = await getToken();

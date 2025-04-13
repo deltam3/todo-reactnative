@@ -1,6 +1,8 @@
 import { TodoItemType } from "@/app/(app)/(tabs)/mainapp";
 
-const API_URL = "http://localhost:3000/todos/";
+import Constants from "expo-constants";
+const { API_URL } = Constants.expoConfig.extra;
+const FINAL_API_URL = `${API_URL}` + `/todos/`;
 
 import * as SecureStore from "expo-secure-store";
 async function getToken() {
@@ -9,7 +11,8 @@ async function getToken() {
 
 const editTodoItem = async (todoItem: TodoItemType) => {
   const token = await getToken();
-  const response = await fetch(`${API_URL}+${todoItem.localId}`, {
+  console.log(`EDIT ADD: ${FINAL_API_URL}`);
+  const response = await fetch(`${FINAL_API_URL}${todoItem.localId}`, {
     method: "PATCH",
     headers: {
       Authorization: `Bearer ${token}`,

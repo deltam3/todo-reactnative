@@ -21,7 +21,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   }
 }
 
-rootProject.name = 'todoapp'
+rootProject.name = 'MyApp'
 
 dependencyResolutionManagement {
   versionCatalogs {

@@ -1,4 +1,4 @@
-package com.expoisgood.todoapp
+package com.expoisgood.myapp
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

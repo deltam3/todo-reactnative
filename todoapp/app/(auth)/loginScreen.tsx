@@ -41,6 +41,8 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+import Constants from "expo-constants";
+const { API_URL } = Constants.expoConfig.extra;
 export default function LoginScreen() {
   const {
     control,
@@ -54,7 +56,7 @@ export default function LoginScreen() {
 
   const postData = async (data: LoginFormData) => {
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -99,7 +101,6 @@ export default function LoginScreen() {
       {errors.username && (
         <Text style={styles.error}>{errors.username.message}</Text>
       )}
-
       <Text style={styles.label}>비밀번호</Text>
 
       <Controller

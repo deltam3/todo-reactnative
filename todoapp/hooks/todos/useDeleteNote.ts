@@ -1,6 +1,8 @@
 import { TodoItemType } from "@/app/(app)/(tabs)/mainapp";
 
-const API_URL = "http://localhost:3000/todos";
+import Constants from "expo-constants";
+const { API_URL } = Constants.expoConfig.extra;
+const FINAL_API_URL = `${API_URL}` + `/todos`;
 
 import * as SecureStore from "expo-secure-store";
 async function getToken() {
@@ -12,7 +14,7 @@ const deleteNoteItem = async (noteItemId: number) => {
   const tester = `${API_URL}/${noteItemId}`;
   console.log(`tester: ${tester}`);
 
-  const response = await fetch(`${API_URL}/${noteItemId}`, {
+  const response = await fetch(`${FINAL_API_URL}/${noteItemId}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,

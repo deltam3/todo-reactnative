@@ -1,4 +1,4 @@
-package com.expoisgood.todoapp
+package com.expoisgood.myapp
 
 import android.app.Application
 import android.content.res.Configuration
