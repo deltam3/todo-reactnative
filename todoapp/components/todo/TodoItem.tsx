@@ -23,8 +23,12 @@ interface TodoItemPropType {
 }
 
 const EditTodoSchema = z.object({
-  title: z.string().min(1, "최소 1글자 이상 입력"),
-  description: z.string().min(1, "최소 1글자 이상 입력"),
+  title: z
+    .string({ required_error: "최소 1글자 이상 입력" })
+    .min(1, "최소 1글자 이상 입력"),
+  description: z
+    .string({ required_error: "최소 1글자 이상 입력" })
+    .min(1, "최소 1글자 이상 입력"),
   completed: z.boolean(),
 });
 
