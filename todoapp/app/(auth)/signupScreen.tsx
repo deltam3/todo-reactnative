@@ -27,16 +27,18 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const loginSchema = z.object({
-  username: z.string().min(4, "아이디는 필수입니다."),
+  username: z
+    .string({ required_error: "아이디는 필수입니다." })
+    .min(4, "최소 4글자 이상 입력"),
   password: z
-    .string({ required_error: "최소 4글자 이상 입력" })
+    .string({ required_error: "비밀번호는 필수입니다." })
     .min(4, "비밀번호는 최소 4자 이상이어야 합니다.")
     .max(20, "비밀번호는 최대 20자까지 입력 가능합니다."),
 });
 type LoginFormData = z.infer<typeof loginSchema>;
 
 import { useRouter } from "expo-router";
-export default function Index() {
+export default function SignupScreen() {
   const router = useRouter();
   const {
     control,
