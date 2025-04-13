@@ -4,6 +4,8 @@ import { Pressable, Text, View } from "react-native";
 
 import * as SecureStore from "expo-secure-store";
 import Card from "@/components/ui/Card";
+import { ThemedView } from "@/components/ThemedView";
+import { ThemedText } from "@/components/ThemedText";
 async function getToken() {
   return await SecureStore.getItemAsync("access_token");
 }
@@ -21,16 +23,16 @@ export default function Settings() {
   };
 
   return (
-    <View>
-      <Card style={{ marginBottom: 18 }}>
-        <Text style={{ textAlign: "center" }}>설정</Text>
-      </Card>
+    <ThemedView style={{ flex: 1 }}>
+      <ThemedText style={{ textAlign: "center", marginVertical: 18 }}>
+        설정
+      </ThemedText>
 
       <Pressable onPress={() => onPressLogout()}>
         <Card>
-          <Text style={{ textAlign: "center" }}>로그아웃</Text>
+          <ThemedText style={{ textAlign: "center" }}>로그아웃</ThemedText>
         </Card>
       </Pressable>
-    </View>
+    </ThemedView>
   );
 }

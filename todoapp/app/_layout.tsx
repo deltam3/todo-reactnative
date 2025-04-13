@@ -53,24 +53,29 @@ export default function RootLayout() {
   if (!loaded) {
     return null;
   }
+
   return (
     <QueryClientProvider client={queryClient}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen
-            name="index"
-            options={{ title: "Home", headerShown: false }}
-          />
-          <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      {/* <SafeAreaView> */}
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen
+          name="index"
+          options={{ title: "Home", headerShown: false }}
+        />
+        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
 
-          <Stack.Screen name="(app)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-      </SafeAreaView>
+        <Stack.Screen name="(app)" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      {/* </SafeAreaView> */}
     </QueryClientProvider>
   );
 }
 
-
-
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
+//   },
+// });

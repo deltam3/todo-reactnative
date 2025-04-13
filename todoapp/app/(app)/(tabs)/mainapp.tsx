@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Pressable,
   FlatList,
+  SafeAreaView,
 } from "react-native";
 
 import * as SecureStore from "expo-secure-store";
@@ -45,6 +46,8 @@ import TodoItem from "@/components/todo/TodoItem";
 import * as SQLite from "expo-sqlite";
 import { useAddTodo } from "@/hooks/todos/useAddTodo";
 import Button from "@/components/ui/Button";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
 
 export default function MainApp() {
   const isAuthenticated = useCheckLoginStatus();
@@ -162,67 +165,72 @@ export default function MainApp() {
   };
 
   return (
-    <View style={{ paddingHorizontal: 8 }}>
-      <Text style={{ textAlign: "center" }}>노트 어플</Text>
+    <ThemedView style={{ paddingHorizontal: 8, flex: 1 }}>
+      <SafeAreaView>
+        <Text style={{ textAlign: "center" }}>노트 어플</Text>
 
-      <View style={{ marginBottom: 16 }}>
-        <Text>제목</Text>
-        <Controller
-          control={control}
-          name="title"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.input}
-              placeholder="제목"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              autoCapitalize="none"
-              value={value}
-            />
-          )}
-        />
-        {errors.title && (
-          <Text style={styles.error}>{errors.title.message}</Text>
-        )}
-
-        <Text>내용</Text>
-        <Controller
-          control={control}
-          name="description"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.input}
-              placeholder="설명"
-              autoCapitalize="none"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
-          )}
-        />
-        {errors.description && (
-          <Text style={styles.error}>{errors.description.message}</Text>
-        )}
-        <Button style={{ backgroundColor: "blue" }}>
-          <Pressable onPress={handleSubmit(onPressSubmit)}>
-            <Text style={{ color: "white", fontWeight: "bold" }}>추가</Text>
-            {/* <Text style={{ textAlign: "center" }}>추가</Text> */}
-          </Pressable>
-        </Button>
-      </View>
-
-      <FlatList
-        data={todos}
-        keyExtractor={(item) => item.localId.toString()}
-        renderItem={({ item }: any) => (
-          <TodoItem
-            item={item}
-            deleteItem={deleteLocalNote}
-            getLocalNotes={getLocalNotes}
+        <View style={{ marginBottom: 16 }}>
+          <ThemedText>제목</ThemedText>
+          <Controller
+            control={control}
+            name="title"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.input}
+                placeholder="제목"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                autoCapitalize="none"
+                value={value}
+              />
+            )}
           />
-        )}
-      />
-    </View>
+          {errors.title && (
+            <ThemedText style={styles.error}>{errors.title.message}</ThemedText>
+          )}
+
+          <ThemedText>내용</ThemedText>
+          <Controller
+            control={control}
+            name="description"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.input}
+                placeholder="설명"
+                autoCapitalize="none"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            )}
+          />
+          {errors.description && (
+            <ThemedText style={styles.error}>
+              {errors.description.message}
+            </ThemedText>
+          )}
+          <Button style={{ backgroundColor: "blue" }}>
+            <Pressable onPress={handleSubmit(onPressSubmit)}>
+              <ThemedText style={{ color: "white", fontWeight: "bold" }}>
+                추가
+              </ThemedText>
+            </Pressable>
+          </Button>
+        </View>
+
+        <FlatList
+          data={todos}
+          keyExtractor={(item) => item.localId.toString()}
+          renderItem={({ item }: any) => (
+            <TodoItem
+              item={item}
+              deleteItem={deleteLocalNote}
+              getLocalNotes={getLocalNotes}
+            />
+          )}
+        />
+      </SafeAreaView>
+    </ThemedView>
   );
 }
 

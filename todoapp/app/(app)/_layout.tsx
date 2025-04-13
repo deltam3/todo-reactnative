@@ -2,7 +2,7 @@ import { Tabs, Stack } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import React from "react";
 import { SQLiteProvider, openDatabaseAsync } from "expo-sqlite";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, Text, useColorScheme, View } from "react-native";
 // export default function AppLayout() {
 //   return (
 //     <React.Suspense
@@ -46,12 +46,16 @@ import { ActivityIndicator, Text, View } from "react-native";
 //   );
 // }
 
-
 export default function AppLayout() {
+  const colorScheme = useColorScheme(); // 'light' or 'dark'
+
+  const isDark = colorScheme === "dark";
   return (
     <React.Suspense
       fallback={
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
           <ActivityIndicator size={"large"} />
           <Text>데이터베이스 로딩중...</Text>
         </View>
@@ -62,19 +66,26 @@ export default function AppLayout() {
         assetSource={{ assetId: require("@/data/SqliteDb.db") }}
         useSuspense
       >
-        <Stack>
-          <Stack.Screen
-            name="(tabs)"
-            options={{ headerShown: false }}
-          />
+        <Stack
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: isDark ? "#121212" : "#ffffff", // header background
+            },
+            headerTintColor: isDark ? "#fff" : "#000", // back button and title
+            contentStyle: {
+              backgroundColor: isDark ? "#000" : "#fff", // screen background
+            },
+          }}
+        >
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-          <Stack.Screen
+          {/* <Stack.Screen
             name="modal"
             options={{
               presentation: "modal",
 
-            }}
-          />
+            }} */}
+          {/* /> */}
         </Stack>
       </SQLiteProvider>
     </React.Suspense>

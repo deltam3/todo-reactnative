@@ -58,7 +58,7 @@ export const Button: React.FC<ButtonProps> = ({
       case "filled":
         return {
           ...baseStyle,
-          backgroundColor: isDark ? zincColors[50] : zincColors[900],
+          backgroundColor: isDark ? zincColors[50] : zincColors[400],
         };
       case "outline":
         return {

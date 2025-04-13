@@ -38,6 +38,7 @@ import * as SQLite from "expo-sqlite";
 import { useEditTodo } from "@/hooks/todos/useEditTodo";
 
 import Card from "../ui/Card";
+import { ThemedText } from "../ThemedText";
 
 export default function TodoItem({
   item,
@@ -112,12 +113,12 @@ export default function TodoItem({
 
   if (isEditMode === false) {
     return (
-      <Card style={{ backgroundColor: "gray", marginBottom: 10 }}>
+      <Card style={{ marginBottom: 10 }}>
         <View>
           <View style={{ marginBottom: 10 }}>
-            <Text>완료여부: {item.completed ? "✅" : "❌"}</Text>
-            <Text style={styles.text}>제목: {item.title}</Text>
-            <Text>설명: {item.description}</Text>
+            <ThemedText>완료여부: {item.completed ? "✅" : "❌"}</ThemedText>
+            <ThemedText>제목: {item.title}</ThemedText>
+            <ThemedText>설명: {item.description}</ThemedText>
           </View>
 
           <View
@@ -129,12 +130,12 @@ export default function TodoItem({
           >
             <Button>
               <Pressable onPress={() => onDeleteHandler()}>
-                <Text>삭제</Text>
+                <ThemedText>삭제</ThemedText>
               </Pressable>
             </Button>
             <Button>
               <Pressable onPress={() => onEditHandler()}>
-                <Text>수정하기</Text>
+                <ThemedText>수정하기</ThemedText>
               </Pressable>
             </Button>
           </View>
@@ -145,7 +146,7 @@ export default function TodoItem({
 
   if (isEditMode === true) {
     return (
-      <Card style={{ backgroundColor: "gray", marginBottom: 10 }}>
+      <Card style={{ marginBottom: 10 }}>
         <View>
           <View
             style={{
@@ -154,7 +155,7 @@ export default function TodoItem({
               alignItems: "center",
             }}
           >
-            <Text style={styles.text}>완료여부: </Text>
+            <ThemedText style={styles.text}>완료여부: </ThemedText>
             <Controller
               control={control}
               name="completed"
@@ -179,7 +180,7 @@ export default function TodoItem({
               alignItems: "center",
             }}
           >
-            <Text style={styles.text}>제목: </Text>
+            <ThemedText style={styles.text}>제목: </ThemedText>
             <Controller
               control={control}
               name="title"
@@ -203,7 +204,7 @@ export default function TodoItem({
               marginBottom: 16,
             }}
           >
-            <Text style={styles.text}>설명: </Text>
+            <ThemedText style={styles.text}>설명: </ThemedText>
             <Controller
               control={control}
               name="description"
@@ -228,12 +229,12 @@ export default function TodoItem({
           >
             <Button>
               <Pressable onPress={handleSubmit(onSubmitEdit)}>
-                <Text>수정 완성하기</Text>
+                <ThemedText>수정 완성하기</ThemedText>
               </Pressable>
             </Button>
             <Button>
               <Pressable onPress={() => cancelEditHandler()}>
-                <Text>취소하기</Text>
+                <ThemedText>취소하기</ThemedText>
               </Pressable>
             </Button>
           </View>
