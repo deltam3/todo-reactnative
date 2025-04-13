@@ -48,6 +48,7 @@ import { useAddTodo } from "@/hooks/todos/useAddTodo";
 import Button from "@/components/ui/Button";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { act } from "@testing-library/react-native";
 
 export default function MainApp() {
   const isAuthenticated = useCheckLoginStatus();
