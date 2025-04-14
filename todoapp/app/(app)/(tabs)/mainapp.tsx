@@ -7,6 +7,7 @@ import {
   Pressable,
   FlatList,
   SafeAreaView,
+  ScrollView,
 } from "react-native";
 
 import * as SecureStore from "expo-secure-store";
@@ -19,11 +20,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTodos } from "@/hooks/todos/useGetTodo";
 
 const AddTodoSchema = z.object({
-  // title: z.string().min(1, "최소 1글자 이상 입력"),
   title: z
     .string({ required_error: "최소 1글자 이상 입력" })
     .min(1, "최소 1글자 이상 입력"),
-  // description: z.string().min(1, "최소 1글자 이상 입력"),
   description: z
     .string({ required_error: "최소 1글자 이상 입력" })
     .min(1, "최소 1글자 이상 입력"),
@@ -69,50 +68,89 @@ export default function MainApp() {
     resolver: zodResolver(AddTodoSchema),
   });
   const [todos, setTodos] = useState<TodoItemType[]>();
-  const { fetchedTodos, isPending } = useTodos();
 
   const db = SQLite.useSQLiteContext();
 
+  // React.useEffect(() => {
+  //   if (!fetchedTodos) return;
+  //   const syncData = async () => {
+  //     try {
+  //       // sqlite 초기화
+  //       await db.execAsync(`
+  //         DROP TABLE IF EXISTS Todo;
+  //         CREATE TABLE IF NOT EXISTS Todo (
+  //         localId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  //         title TEXT NOT NULL,
+  //         description TEXT NOT NULL,
+  //         completed BOOLEAN NOT NULL DEFAULT 0
+  //       );`);
+  //     } catch (dbError) {
+  //       console.error("Error initializing SQLite:", dbError);
+  //     }
+
+  //     try {
+  //       // Construct the INSERT statements
+  //       const insertQueries = fetchedTodos
+  //         .map(
+  //           (todo: TodoItemType) => `
+  //         INSERT INTO Todo (localId, title, description, completed)
+  //         VALUES ('${todo.localId}','${todo.title}', '${todo.description}', ${todo.completed});
+  //       `
+  //         )
+  //         .join(" ");
+
+  //       // Execute the bulk insert
+  //       await db.execAsync(`
+  //         ${insertQueries}
+  //       `);
+
+  //       await getLocalNotes();
+  //     } catch (error) {}
+  //   };
+
+  //   syncData();
+  // }, [fetchedTodos]);
+
+  const hasSyncedRef = React.useRef(false);
+  const { fetchedTodos, isPending } = useTodos();
   React.useEffect(() => {
-    if (!fetchedTodos) return;
+    if (hasSyncedRef.current) return;
+
     const syncData = async () => {
       try {
-        // sqlite 초기화
         await db.execAsync(`
-          DROP TABLE IF EXISTS Todo;
-          CREATE TABLE IF NOT EXISTS Todo (
-          localId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-          title TEXT NOT NULL,
-          description TEXT NOT NULL,
-          completed BOOLEAN NOT NULL DEFAULT 0
-        );`);
+        DROP TABLE IF EXISTS Todo;
+        CREATE TABLE IF NOT EXISTS Todo (
+        localId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        completed BOOLEAN NOT NULL DEFAULT 0
+      );`);
       } catch (dbError) {
         console.error("Error initializing SQLite:", dbError);
       }
 
       try {
-        // Construct the INSERT statements
         const insertQueries = fetchedTodos
           .map(
             (todo: TodoItemType) => `
-          INSERT INTO Todo (localId, title, description, completed)
-          VALUES ('${todo.localId}','${todo.title}', '${todo.description}', ${todo.completed});
-        `
+        INSERT INTO Todo (localId, title, description, completed)
+        VALUES ('${todo.localId}', '${todo.title}', '${todo.description}', ${todo.completed});
+      `
           )
           .join(" ");
 
-        // Execute the bulk insert
-        await db.execAsync(`
-          ${insertQueries}
-        `);
-
+        await db.execAsync(`${insertQueries}`);
         await getLocalNotes();
-      } catch (error) {}
+
+        hasSyncedRef.current = true;
+      } catch (error) {
+        console.error("Error inserting data:", error);
+      }
     };
 
     syncData();
   }, [fetchedTodos]);
-
   async function getLocalNotes() {
     try {
       const result = (await db.getAllAsync(
@@ -169,71 +207,69 @@ export default function MainApp() {
   };
 
   return (
-    <ThemedView style={{ paddingHorizontal: 8, flex: 1 }}>
-      <SafeAreaView>
-        <Text style={{ textAlign: "center" }}>노트 어플</Text>
-        <Text>{`${API_URL}` + `/todos`}</Text>
-        <View style={{ marginBottom: 16 }}>
-          <ThemedText>제목</ThemedText>
-          <Controller
-            control={control}
-            name="title"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                style={styles.input}
-                placeholder="제목"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                autoCapitalize="none"
-                value={value}
-              />
-            )}
-          />
-          {errors.title && (
-            <ThemedText style={styles.error}>{errors.title.message}</ThemedText>
-          )}
+    <ThemedView style={{ paddingHorizontal: 8, paddingTop: 16, flex: 1 }}>
+      <Text style={{ textAlign: "center" }}>노트 어플</Text>
 
-          <ThemedText>내용</ThemedText>
-          <Controller
-            control={control}
-            name="description"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                style={styles.input}
-                placeholder="설명"
-                autoCapitalize="none"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-              />
-            )}
-          />
-          {errors.description && (
-            <ThemedText style={styles.error}>
-              {errors.description.message}
-            </ThemedText>
-          )}
-          <Button style={{ backgroundColor: "blue" }}>
-            <Pressable onPress={handleSubmit(onPressSubmit)}>
-              <ThemedText style={{ color: "white", fontWeight: "bold" }}>
-                추가
-              </ThemedText>
-            </Pressable>
-          </Button>
-        </View>
-
-        <FlatList
-          data={todos}
-          keyExtractor={(item) => item.localId.toString()}
-          renderItem={({ item }: any) => (
-            <TodoItem
-              item={item}
-              deleteItem={deleteLocalNote}
-              getLocalNotes={getLocalNotes}
+      <View style={{ marginBottom: 16 }}>
+        <ThemedText>제목</ThemedText>
+        <Controller
+          control={control}
+          name="title"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="제목"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              autoCapitalize="none"
+              value={value}
             />
           )}
         />
-      </SafeAreaView>
+        {errors.title && (
+          <ThemedText style={styles.error}>{errors.title.message}</ThemedText>
+        )}
+
+        <ThemedText>내용</ThemedText>
+        <Controller
+          control={control}
+          name="description"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="설명"
+              autoCapitalize="none"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+          )}
+        />
+        {errors.description && (
+          <ThemedText style={styles.error}>
+            {errors.description.message}
+          </ThemedText>
+        )}
+        <Button style={{ backgroundColor: "blue" }}>
+          <Pressable onPress={handleSubmit(onPressSubmit)}>
+            <ThemedText style={{ color: "white", fontWeight: "bold" }}>
+              추가
+            </ThemedText>
+          </Pressable>
+        </Button>
+      </View>
+
+      <FlatList
+        data={todos}
+        keyExtractor={(item) => item.localId.toString()}
+        renderItem={({ item }: any) => (
+          <TodoItem
+            item={item}
+            deleteItem={deleteLocalNote}
+            getLocalNotes={getLocalNotes}
+          />
+        )}
+      />
     </ThemedView>
   );
 }

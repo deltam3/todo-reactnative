@@ -6,13 +6,13 @@ async function getToken() {
 }
 
 import Constants from "expo-constants";
-const { PREAPI_URL } = Constants.expoConfig.extra;
-const API_URL = `${PREAPI_URL}` + `/todos`;
+const { API_URL } = Constants.expoConfig.extra;
+const FINAL_API_URL = `${API_URL}` + `/todos`;
 
 const getTodos = async () => {
   const token = await getToken();
-  // console.log(token);
-  const response = await fetch(API_URL, {
+
+  const response = await fetch(FINAL_API_URL, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -31,5 +31,6 @@ export const useTodos = () => {
     queryKey: ["todos"],
     queryFn: getTodos,
   });
+
   return { fetchedTodos, isPending };
 };
