@@ -1,7 +1,18 @@
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, Button, Pressable } from "react-native";
 import { Link } from "expo-router";
 
 import Slider from "../../components/onboarding/Slider";
+import * as SecureStore from "expo-secure-store";
+import { ThemedView } from "@/components/ThemedView";
+import { Colors } from "@/constants/Colors";
+async function save(key: string, value: string) {
+  await SecureStore.setItemAsync(key, value);
+}
+
+async function getValueFor(key: string) {
+  let result = await SecureStore.getItemAsync(key);
+  return result;
+}
 
 export default function Index() {
   return (
@@ -17,6 +28,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 30,
+    backgroundColor: Colors.light.background,
   },
   text: {
     color: "#fff",

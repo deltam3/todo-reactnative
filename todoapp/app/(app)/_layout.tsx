@@ -2,7 +2,13 @@ import { Tabs, Stack } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import React from "react";
 import { SQLiteProvider, openDatabaseAsync } from "expo-sqlite";
-import { ActivityIndicator, Text, useColorScheme, View } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  useColorScheme,
+  View,
+} from "react-native";
 // export default function AppLayout() {
 //   return (
 //     <React.Suspense
@@ -78,14 +84,6 @@ export default function AppLayout() {
           }}
         >
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
-          {/* <Stack.Screen
-            name="modal"
-            options={{
-              presentation: "modal",
-
-            }} */}
-          {/* /> */}
         </Stack>
       </SQLiteProvider>
     </React.Suspense>

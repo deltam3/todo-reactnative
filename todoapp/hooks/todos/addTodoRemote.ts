@@ -26,7 +26,7 @@ const addTodoItem = async (todoItem: TodoItemType) => {
   return result;
 };
 
-export const useAddTodo = async (todoItem: TodoItemType) => {
+export const addTodoRemote = async (todoItem: TodoItemType) => {
   try {
     console.log("API ADD: " + API_URL);
     const result = await addTodoItem(todoItem);

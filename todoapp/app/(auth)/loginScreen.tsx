@@ -5,6 +5,7 @@ import {
   TextInput,
   StyleSheet,
   Pressable,
+  ImageBackground,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Link } from "expo-router";
@@ -17,14 +18,9 @@ async function save(key: string, value: string) {
 }
 
 async function getValueFor(key: string) {
-  let result = await SecureStore.getItemAsync(key);
-  if (result) {
-    console.log(result);
-  } else {
-    console.log(result);
-  }
+  let result = await SecureStore.getItemAsync("access_token");
+  return result;
 }
-
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,8 +38,12 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 import Constants from "expo-constants";
+import { Colors } from "@/constants/Colors";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const { API_URL } = Constants.expoConfig.extra;
+
 export default function LoginScreen() {
+  const letter = getValueFor("isOnboarded");
   const {
     control,
     handleSubmit,
@@ -73,6 +73,7 @@ export default function LoginScreen() {
         const token = responseData.access_token;
         save("access_token", token);
         router.navigate("/(app)/(tabs)/mainapp");
+        // return <Redirect href="/(app)/(tabs)/mainapp" />;
       } else {
         alert("로그인 실패: access_token이 없습니다.");
       }
@@ -80,6 +81,20 @@ export default function LoginScreen() {
       console.error("Error making POST request:", error);
     }
   };
+
+  useEffect(() => {
+    const fetchLoggedInStatus = async () => {
+      // const value = await AsyncStorage.getItem("isOnboarded");
+
+      const loggedIn = await getValueFor("access_token");
+
+      if (loggedIn) {
+        <Redirect href="/(app)/(tabs)/mainapp" />;
+      }
+    };
+
+    fetchLoggedInStatus();
+  }, []);
   return (
     <View style={styles.container}>
       <Text style={styles.label}>아이디</Text>
@@ -138,6 +153,7 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: "center",
     flex: 1,
+    backgroundColor: Colors.light.background,
   },
   label: {
     marginBottom: 4,
@@ -156,7 +172,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   button: {
-    backgroundColor: "#3478f6",
+    backgroundColor: Colors.light.tint,
     paddingVertical: 12,
     borderRadius: 6,
     alignItems: "center",

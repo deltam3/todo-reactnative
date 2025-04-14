@@ -8,6 +8,7 @@ import {
   FlatList,
   SafeAreaView,
   ScrollView,
+  Platform,
 } from "react-native";
 
 import * as SecureStore from "expo-secure-store";
@@ -43,21 +44,22 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import TodoItem from "@/components/todo/TodoItem";
 
 import * as SQLite from "expo-sqlite";
-import { useAddTodo } from "@/hooks/todos/useAddTodo";
+import { addTodoRemote, useAddTodo } from "@/hooks/todos/addTodoRemote";
 import Button from "@/components/ui/Button";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { act } from "@testing-library/react-native";
 
 import Constants from "expo-constants";
+import { StatusBar } from "expo-status-bar";
+import { Colors } from "@/constants/Colors";
+import { useThemeColor } from "@/hooks/useThemeColor";
 const { API_URL } = Constants.expoConfig.extra;
 
 export default function MainApp() {
   const isAuthenticated = useCheckLoginStatus();
 
-  if (!isAuthenticated) {
-    return <Redirect href="/(auth)/loginScreen" />;
-  }
+  const { fetchedTodos, isPending } = useTodos();
 
   const {
     control,
@@ -68,6 +70,8 @@ export default function MainApp() {
     resolver: zodResolver(AddTodoSchema),
   });
   const [todos, setTodos] = useState<TodoItemType[]>();
+
+  const hasSyncedRef = React.useRef(false);
 
   const db = SQLite.useSQLiteContext();
 
@@ -111,8 +115,6 @@ export default function MainApp() {
   //   syncData();
   // }, [fetchedTodos]);
 
-  const hasSyncedRef = React.useRef(false);
-  const { fetchedTodos, isPending } = useTodos();
   React.useEffect(() => {
     if (hasSyncedRef.current) return;
 
@@ -151,6 +153,7 @@ export default function MainApp() {
 
     syncData();
   }, [fetchedTodos]);
+
   async function getLocalNotes() {
     try {
       const result = (await db.getAllAsync(
@@ -192,7 +195,6 @@ export default function MainApp() {
   }
 
   const onPressSubmit = async (data: TodoFormData) => {
-    console.log(data);
     const firstTemp = { title: data.title, description: data.description };
     const insertedId = await createLocalNote(firstTemp);
 
@@ -201,13 +203,25 @@ export default function MainApp() {
       description: data.description,
       localId: insertedId,
     } as TodoItemType;
-    useAddTodo(temp);
+    addTodoRemote(temp);
 
     reset();
   };
 
+  if (isAuthenticated === null) {
+    return <ActivityIndicator size="large" color="#00ff00" />;
+  }
+
+  if (!isAuthenticated) {
+    return <Redirect href="/(auth)/loginScreen" />;
+  }
+  if (isPending) {
+    return <ActivityIndicator size="large" color="#00ff00" />;
+  }
+
   return (
-    <ThemedView style={{ paddingHorizontal: 8, paddingTop: 16, flex: 1 }}>
+    // <ThemedView style={{ paddingHorizontal: 8, paddingTop: 16, flex: 1 }}>
+    <ThemedView style={styles.safeArea}>
       <Text style={{ textAlign: "center" }}>노트 어플</Text>
 
       <View style={{ marginBottom: 16 }}>
@@ -250,9 +264,15 @@ export default function MainApp() {
             {errors.description.message}
           </ThemedText>
         )}
-        <Button style={{ backgroundColor: "blue" }}>
+        <Button style={{ backgroundColor: Colors.light.tint }}>
           <Pressable onPress={handleSubmit(onPressSubmit)}>
-            <ThemedText style={{ color: "white", fontWeight: "bold" }}>
+            {/* <ThemedText style={{ color: "white", fontWeight: "bold" }}> */}
+            <ThemedText
+              style={{
+                color: "#fff",
+                fontWeight: "bold",
+              }}
+            >
               추가
             </ThemedText>
           </Pressable>
@@ -275,6 +295,11 @@ export default function MainApp() {
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    paddingTop: 24,
+    paddingHorizontal: 8,
+  },
   container: {
     padding: 20,
     justifyContent: "center",

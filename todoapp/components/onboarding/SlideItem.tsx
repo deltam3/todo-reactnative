@@ -7,9 +7,9 @@ import {
   Easing,
   Pressable,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -25,6 +25,7 @@ interface SlideItemProps {
 }
 
 const SlideItem = ({ item, isLastItem }: SlideItemProps) => {
+  const router = useRouter();
   const translateXImage = new Animated.Value(-20);
 
   Animated.timing(translateXImage, {
@@ -37,7 +38,12 @@ const SlideItem = ({ item, isLastItem }: SlideItemProps) => {
   const onFinishOnboarding = async () => {
     try {
       await AsyncStorage.setItem("isOnboarded", "true");
-    } catch (e) {}
+      // const value = await AsyncStorage.getItem("isOnboarded");
+      await AsyncStorage.getItem("isOnboarded");
+      router.push("/(auth)/loginScreen");
+    } catch (e) {
+      console.error("Failed to set onboarding flag", e);
+    }
   };
 
   return (
@@ -59,12 +65,13 @@ const SlideItem = ({ item, isLastItem }: SlideItemProps) => {
 
       <View style={styles.content}>
         {isLastItem && (
-          <Pressable onPress={() => onFinishOnboarding()}>
+          <Pressable onPress={onFinishOnboarding}>
             <View>
-              <Link href="/(auth)/loginScreen">로그인하기</Link>
+              <Text>로그인하기</Text>
             </View>
           </Pressable>
         )}
+
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.description}>{item.description}</Text>
       </View>

@@ -56,7 +56,6 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* <SafeAreaView> */}
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen
           name="index"
@@ -68,7 +67,6 @@ export default function RootLayout() {
         <Stack.Screen name="(app)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
-      {/* </SafeAreaView> */}
     </QueryClientProvider>
   );
 }

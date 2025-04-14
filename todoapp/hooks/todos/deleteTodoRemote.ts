@@ -31,7 +31,7 @@ const deleteNoteItem = async (noteItemId: number) => {
   return result;
 };
 
-export const useDeleteNoteItem = (noteItemId: number) => {
+export const deleteTodoRemote = (noteItemId: number) => {
   const result = deleteNoteItem(noteItemId);
   return result;
 };

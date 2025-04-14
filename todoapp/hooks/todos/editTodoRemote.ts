@@ -28,7 +28,7 @@ const editTodoItem = async (todoItem: TodoItemType) => {
   return result;
 };
 
-export const useEditTodo = async (todoItem: TodoItemType) => {
+export const editTodoRemote = async (todoItem: TodoItemType) => {
   try {
     const result = await editTodoItem(todoItem);
     console.log();

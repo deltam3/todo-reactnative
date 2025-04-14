@@ -12,8 +12,8 @@ config({ path: resolve(__dirname, envFile) });
 
 // Export a typed config object
 const expoConfig: ExpoConfig = {
-  name: "MyApp",
-  slug: "myapp",
+  name: "NoteApp",
+  slug: "NoteApp",
   version: "1.0.0",
   extra: {
     API_URL: process.env.API_URL || "http://localhost:3000",
@@ -23,8 +23,17 @@ const expoConfig: ExpoConfig = {
     package: "com.expoisgood.myapp",
   },
   ios: {
-    bundleIdentifier: "com.expoisgood.myapp",
+    supportsTablet: true,
+    bundleIdentifier: "com.expoisgod.myapp",
   },
+  icon: "./assets/images/noteapplogo.png",
+  splash: {
+    image: "./assets/images/splashblue.png",
+  },
+  //   image: "./assets/images/noteapplogo.png",
+  //   resizeMode: "cover", // or "contain"
+  //   backgroundColor: "#DFC8B4",
+  // },
 };
 
 export default expoConfig;

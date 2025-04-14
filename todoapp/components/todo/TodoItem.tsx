@@ -11,7 +11,7 @@ import Button from "../ui/Button";
 
 import { Link } from "expo-router";
 import { TodoItemType } from "@/app/(app)/(tabs)/mainapp";
-import { useDeleteNoteItem } from "@/hooks/todos/useDeleteNote";
+import { deleteTodoRemote } from "@/hooks/todos/deleteTodoRemote";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,10 +35,11 @@ const EditTodoSchema = z.object({
 type EditTodoFormData = z.infer<typeof EditTodoSchema>;
 
 import * as SQLite from "expo-sqlite";
-import { useEditTodo } from "@/hooks/todos/useEditTodo";
+import { editTodoRemote } from "@/hooks/todos/editTodoRemote";
 
 import Card from "../ui/Card";
 import { ThemedText } from "../ThemedText";
+import { Colors } from "@/constants/Colors";
 
 export default function TodoItem({
   item,
@@ -69,7 +70,7 @@ export default function TodoItem({
 
   const onDeleteHandler = () => {
     deleteItem(item.localId);
-    useDeleteNoteItem(item.localId);
+    deleteTodoRemote(item.localId);
   };
 
   async function updateLocalNote(id: number, updatedData: EditTodoFormData) {
@@ -91,13 +92,12 @@ export default function TodoItem({
   }
 
   const onSubmitEdit = async (data: EditTodoFormData) => {
-    console.log("onSubmitEdit triggered", data);
     updateLocalNote(item.localId, {
       title: data.title,
       description: data.description,
       completed: data.completed,
     });
-    useEditTodo({
+    editTodoRemote({
       localId: item.localId,
       title: data.title,
       description: data.description,
@@ -113,7 +113,7 @@ export default function TodoItem({
 
   if (isEditMode === false) {
     return (
-      <Card style={{ marginBottom: 10 }}>
+      <Card style={{ marginBottom: 10, backgroundColor: "#fff" }}>
         <View>
           <View style={{ marginBottom: 10 }}>
             <ThemedText>완료여부: {item.completed ? "✅" : "❌"}</ThemedText>
@@ -128,14 +128,14 @@ export default function TodoItem({
               paddingHorizontal: 30,
             }}
           >
-            <Button>
+            <Button style={{ backgroundColor: Colors.light.tint }}>
               <Pressable onPress={() => onDeleteHandler()}>
-                <ThemedText>삭제</ThemedText>
+                <ThemedText style={{ color: "white" }}>삭제</ThemedText>
               </Pressable>
             </Button>
-            <Button>
+            <Button style={{ backgroundColor: Colors.light.tint }}>
               <Pressable onPress={() => onEditHandler()}>
-                <ThemedText>수정하기</ThemedText>
+                <ThemedText style={{ color: "white" }}>수정하기</ThemedText>
               </Pressable>
             </Button>
           </View>
@@ -146,7 +146,7 @@ export default function TodoItem({
 
   if (isEditMode === true) {
     return (
-      <Card style={{ marginBottom: 10 }}>
+      <Card style={{ marginBottom: 10, backgroundColor: "#fff" }}>
         <View>
           <View
             style={{
@@ -227,14 +227,16 @@ export default function TodoItem({
               paddingHorizontal: 20,
             }}
           >
-            <Button>
+            <Button style={{ backgroundColor: Colors.light.tint }}>
               <Pressable onPress={handleSubmit(onSubmitEdit)}>
-                <ThemedText>수정 완성하기</ThemedText>
+                <ThemedText style={{ color: "white" }}>
+                  수정 완성하기
+                </ThemedText>
               </Pressable>
             </Button>
-            <Button>
+            <Button style={{ backgroundColor: Colors.light.tint }}>
               <Pressable onPress={() => cancelEditHandler()}>
-                <ThemedText>취소하기</ThemedText>
+                <ThemedText style={{ color: "white" }}>취소하기</ThemedText>
               </Pressable>
             </Button>
           </View>
